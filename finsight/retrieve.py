@@ -1,3 +1,24 @@
+"""
+retrieve.py — RAG retrieval for FinSight pipeline
+==================================================
+Two retrieval strategies:
+
+1. **Example retrieval** (retrieve_examples):
+   Given a test question, find the K most similar *solved* training
+   questions to use as few-shot examples for the LLM prompt.
+   Similarity is computed on (question_template, unit) pairs.
+
+2. **Row retrieval** (retrieve_rows):
+   Given a question and a rendered page, find the most relevant
+   rows as evidence candidates using BM25 sparse retrieval.
+
+Usage::
+
+    from finsight.retrieve import retrieve_examples, retrieve_rows
+
+    examples = retrieve_examples(question, train_data, k=4)
+    rows = retrieve_rows(question, page_text, top_k=10)
+"""
 """Retrieval-augmented generation, no training.
 
 1. Example RAG: for each question, the most similar *solved* training questions are shown to the
@@ -132,3 +153,4 @@ class RowRetriever:
             if s > 0:
                 scored.append((blk["id"], text, s))
         return sorted(scored, key=lambda x: -x[2])[:k]
+
