@@ -1,3 +1,26 @@
+"""
+solve.py � Final FinSight pipeline (Stage 3-5)
+===============================================
+Implements the complete inference pipeline:
+
+    page_text + question
+        -> prompt with retrieved examples   (Stage 3: REASON)
+        -> parse LLM output                 (Stage 3: parse)
+        -> safe Python executor             (Stage 4: COMPUTE)
+        -> evidence grounding               (Stage 5: VERIFY)
+        -> weighted vote / ensemble         (Stage 5: VERIFY)
+        -> final answer + confidence
+
+Key functions
+-------------
+solve(question, page_text, examples, llm_client)
+    Run the full pipeline for a single question.
+    Returns a dict with keys: answer, unit, program, evidence, confidence.
+
+ensemble(tatllm_pred, pipeline_pred, page_text)
+    Where TAT-LLM-7B and the pipeline disagree, draw 4 samples
+    from the pipeline and combine with weighted vote.
+"""
 """FinSight final pipeline. No training anywhere.
 
     page text ─► example RAG (similar solved training questions) ─► open LLM writes
@@ -144,3 +167,4 @@ def answer(client, doc, question, retriever=None, k=4, n_samples=0, mode="direct
     cands = [candidate(client.chat(msgs, 0.0, max_tokens), doc, index)]
     cands += [candidate(client.chat(msgs, 0.7, max_tokens, seed=i), doc, index) for i in range(n_samples)]
     return combine([(1.0, cands)])
+
