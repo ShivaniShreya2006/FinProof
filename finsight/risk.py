@@ -1,3 +1,38 @@
+"""
+risk.py — Automatic financial risk report generator
+====================================================
+Given a set of verified line items extracted from a financial document,
+generates a structured risk report covering six dimensions:
+
+Risk Dimensions
+---------------
+1. **Liquidity**     — Current ratio, quick ratio
+2. **Leverage**      — Debt-to-equity, debt-to-assets
+3. **Interest Cover** — EBIT / interest expense
+4. **Profitability** — Net margin, ROE, ROA
+5. **Growth**        — YoY revenue and profit changes
+6. **Cash Backing**  — Operating cash flow vs reported profit
+
+Severity Levels
+---------------
+- **Low**    — Within healthy thresholds
+- **Medium** — Approaching risk threshold
+- **High**   — Exceeds risk threshold, requires attention
+
+Large Change Detection
+----------------------
+Flags any line item with a year-on-year change > 20% for review.
+All values are cross-checked against their source rows in the document.
+
+Usage::
+
+    from finsight.risk import risk_report
+
+    report = risk_report(line_items, page_text)
+    print(report.summary)
+    for flag in report.flags:
+        print(f'[{flag.severity}] {flag.dimension}: {flag.message}')
+"""
 """Automatic risk report: when a statement is loaded, FinSight asks a fixed set of risk questions
 without the user typing anything ("Can the company pay its short-term debts?", "Is it relying on
 debt?", ...) and answers each with a value, the formula, a Low / Medium / High flag and the rows used.
@@ -233,3 +268,4 @@ def render_html(rep):
             + (f"<p><b>Large year-on-year changes</b></p><ul>{unusual}</ul>" if unusual else "")
             + (f"<p><b>Not in this document</b></p><ul>{missing}</ul>" if missing else "")
             + "<p><small>Thresholds are general rules of thumb, not industry-specific limits.</small></p>")
+
